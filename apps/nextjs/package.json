@@ -1,0 +1,58 @@
+{
+  "name": "@ai-song-generator/nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm with-env next build",
+    "clean": "git clean -xdf .next .turbo node_modules",
+    "dev": "pnpm with-env next dev",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "dotenv -v SKIP_ENV_VALIDATION=1 next lint",
+    "start": "pnpm with-env next start",
+    "typecheck": "tsc --noEmit",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "@ai-song-generator/api": "*",
+    "@ai-song-generator/auth": "*",
+    "@ai-song-generator/db": "*",
+    "@ai-song-generator/ui": "*",
+    "@ai-song-generator/validators": "*",
+    "@t3-oss/env-nextjs": "^0.9.2",
+    "@tanstack/react-query": "^5.22.2",
+    "@trpc/client": "11.0.0-next-beta.294",
+    "@trpc/react-query": "11.0.0-next-beta.294",
+    "@trpc/server": "11.0.0-next-beta.294",
+    "geist": "^1.2.2",
+    "next": "^14.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "superjson": "2.2.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@ai-song-generator/eslint-config": "*",
+    "@ai-song-generator/prettier-config": "*",
+    "@ai-song-generator/tailwind-config": "*",
+    "@ai-song-generator/tsconfig": "*",
+    "@types/node": "^20.11.20",
+    "@types/react": "^18.2.57",
+    "@types/react-dom": "^18.2.19",
+    "dotenv-cli": "^7.3.0",
+    "eslint": "^8.56.0",
+    "jiti": "^1.21.0",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@ai-song-generator/eslint-config/base",
+      "@ai-song-generator/eslint-config/nextjs",
+      "@ai-song-generator/eslint-config/react"
+    ]
+  },
+  "prettier": "@ai-song-generator/prettier-config"
+}

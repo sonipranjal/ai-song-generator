@@ -1,0 +1,35 @@
+{
+  "name": "@ai-song-generator/auth-proxy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nitro build",
+    "clean": "rm -rf .turbo node_modules",
+    "dev": "nitro dev --port 3001",
+    "lint": "eslint .",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@auth/core": "0.27.0"
+  },
+  "devDependencies": {
+    "@ai-song-generator/eslint-config": "*",
+    "@ai-song-generator/prettier-config": "*",
+    "@ai-song-generator/tailwind-config": "*",
+    "@ai-song-generator/tsconfig": "*",
+    "@types/node": "^20.11.20",
+    "eslint": "^8.56.0",
+    "h3": "^1.10.2",
+    "nitropack": "^2.8.1",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@ai-song-generator/eslint-config/base"
+    ]
+  },
+  "prettier": "@ai-song-generator/prettier-config"
+}

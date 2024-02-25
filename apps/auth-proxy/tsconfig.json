@@ -1,0 +1,4 @@
+{
+  "extends": "@ai-song-generator/tsconfig/base.json",
+  "include": ["routes"]
+}
