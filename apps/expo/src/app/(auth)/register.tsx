@@ -10,6 +10,7 @@ const Register = () => {
       <Stack.Screen
         options={{
           title: "Register",
+          headerShown: true,
         }}
       />
       <View>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Constants from "expo-constants";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
@@ -30,7 +31,7 @@ const getBaseUrl = () => {
   const localhost = debuggerHost?.split(":")[0];
 
   if (!localhost) {
-    // return "https://turbo.t3.gg";
+    //todo: return "https://turbo.t3.gg"; -> server api endpoint
     throw new Error(
       "Failed to get localhost. Please point to your production server.",
     );
@@ -44,6 +45,8 @@ const getBaseUrl = () => {
  */
 export function TRPCProvider(props: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
+  const supabase = useSupabaseClient();
+
   const [trpcClient] = useState(() =>
     api.createClient({
       links: [
@@ -56,9 +59,14 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
         httpBatchLink({
           transformer: superjson,
           url: `${getBaseUrl()}/api/trpc`,
-          headers() {
+          headers: async () => {
             const headers = new Map<string, string>();
             headers.set("x-trpc-source", "expo-react");
+
+            const { data } = await supabase.auth.getSession();
+            const token = data.session?.access_token;
+            if (token) headers.set("authorization", token);
+
             return Object.fromEntries(headers);
           },
         }),

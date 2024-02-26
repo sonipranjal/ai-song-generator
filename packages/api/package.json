@@ -14,7 +14,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-song-generator/auth": "*",
     "@ai-song-generator/db": "*",
     "@ai-song-generator/validators": "*",
     "@trpc/server": "11.0.0-next-beta.294",

@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useUser } from "@supabase/auth-helpers-react";
 import LottieView from "lottie-react-native";
 
 const Index = () => {
   const router = useRouter();
+  const user = useUser();
+
+  useEffect(() => {
+    if (user) {
+      router.push("/home/main");
+    }
+  }, [user]);
 
   return (
     <SafeAreaView>

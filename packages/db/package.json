@@ -17,8 +17,8 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@planetscale/database": "^1.16.0",
-    "drizzle-orm": "^0.29.4"
+    "drizzle-orm": "^0.29.4",
+    "postgres": "^3.4.3"
   },
   "devDependencies": {
     "@ai-song-generator/eslint-config": "*",

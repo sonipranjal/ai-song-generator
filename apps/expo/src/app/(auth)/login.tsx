@@ -11,6 +11,7 @@ const Login = () => {
       <Stack.Screen
         options={{
           title: "Login",
+          headerShown: true,
         }}
       />
       <SafeAreaView>

@@ -1,8 +1,8 @@
 import { cache } from "react";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { createCaller, createTRPCContext } from "@ai-song-generator/api";
-import { auth } from "@ai-song-generator/auth";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -12,8 +12,10 @@ const createContext = cache(async () => {
   const heads = new Headers(headers());
   heads.set("x-trpc-source", "rsc");
 
+  const supabase = createServerComponentClient({ cookies });
+
   return createTRPCContext({
-    session: await auth(),
+    supabase,
     headers: heads,
   });
 });

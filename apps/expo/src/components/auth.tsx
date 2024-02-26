@@ -1,6 +1,8 @@
-import React from "react";
-import { Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Text, TextInput, View } from "react-native";
+import { router } from "expo-router";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -20,14 +22,50 @@ interface AuthProps {
 }
 
 export const Auth = ({ formType }: AuthProps) => {
+  const user = useUser();
+  const supabase = useSupabaseClient();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  // todo: handle authentication
-  const handleAuth = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const [loading, setLoading] = useState(false);
+
+  const handleAuth = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (formType === "register") {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+        });
+
+        if (error) Alert.alert(error.message);
+        if (!session) {
+          Alert.alert("Please check your inbox for email verification!");
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        });
+
+        if (error) Alert.alert(error.message);
+      }
+    } catch (error) {
+      Alert.alert("something went wrong while signing up!");
+    }
+
+    setLoading(false);
   };
+
+  useEffect(() => {
+    if (user) {
+      router.push("/home/main");
+    }
+  }, [user]);
 
   return (
     <View>
@@ -75,7 +113,13 @@ export const Auth = ({ formType }: AuthProps) => {
         )}
 
         <Button
-          buttonText={formType === "register" ? "Register" : "Login"}
+          buttonText={
+            loading
+              ? "loading..."
+              : formType === "register"
+                ? "Register"
+                : "Login"
+          }
           onPressHandler={form.handleSubmit(handleAuth)}
         />
       </View>
