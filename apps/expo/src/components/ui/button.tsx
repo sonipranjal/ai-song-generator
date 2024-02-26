@@ -7,22 +7,27 @@ interface ButtonProps {
   onPressHandler: () => void;
   buttonText: string;
   className?: string;
+  isLoading?: boolean;
 }
 
 export const Button = ({
   buttonText,
   onPressHandler,
   className,
+  isLoading,
 }: ButtonProps) => {
   return (
     <TouchableOpacity
+      disabled={isLoading}
       onPress={onPressHandler}
       className={cn(
         "flex w-full items-center justify-center rounded-lg bg-black p-4",
         className,
       )}
     >
-      <Text className="text-white">{buttonText}</Text>
+      <Text className="text-white">
+        {isLoading ? "Loading..." : buttonText}
+      </Text>
     </TouchableOpacity>
   );
 };

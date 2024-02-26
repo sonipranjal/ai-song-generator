@@ -13,10 +13,7 @@ export const env = createEnv({
    * This way you can ensure the app isn't built with invalid env vars.
    */
   server: {
-    // DB_HOST: z.string(),
-    // DB_NAME: z.string(),
-    // DB_PASSWORD: z.string(),
-    // DB_USERNAME: z.string(),
+    REPLICATE_API_TOKEN: z.string(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -31,7 +28,6 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     VERCEL_ENV: process.env.VERCEL_ENV,
     NODE_ENV: process.env.NODE_ENV,
-
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   skipValidation:

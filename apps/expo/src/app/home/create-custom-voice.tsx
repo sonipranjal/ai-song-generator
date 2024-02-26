@@ -4,34 +4,35 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "~/components/ui/button";
+import { api } from "~/utils/api";
 
 const formSchema = z.object({
   youtubeUrl: z.string().url({
     message: "must be a valid youtube url.",
   }),
-  name: z.string().min(2, {
+  voiceName: z.string().min(2, {
     message: "must be at least 2 chars.",
   }),
 });
 
 const CreateCustomVoice = () => {
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams();
+
+  const createCustomVoice = api.replicate.createCustomVoice.useMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  // todo: handle generate song
   const handleCreateCustomVoice = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    createCustomVoice.mutate(values);
   };
 
   return (
@@ -91,13 +92,13 @@ const CreateCustomVoice = () => {
                   value={value}
                 />
               )}
-              name="name"
+              name="voiceName"
               rules={{ required: true }}
             />
 
-            {form.formState.errors.name && (
+            {form.formState.errors.voiceName && (
               <Text className="text-sm font-light text-red-500">
-                {form.formState.errors.name?.message}
+                {form.formState.errors.voiceName?.message}
               </Text>
             )}
           </View>
@@ -107,6 +108,7 @@ const CreateCustomVoice = () => {
             onPressHandler={() => {
               form.handleSubmit(handleCreateCustomVoice)();
             }}
+            isLoading={createCustomVoice.isPending}
           />
         </View>
       </View>
