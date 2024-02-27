@@ -2,6 +2,8 @@ import crypto from "crypto";
 import type { NextRequest } from "next/server";
 import Replicate from "replicate";
 
+import { db, eq, generatedSongs, voices } from "@ai-song-generator/db";
+
 import { env } from "~/env";
 
 function setCorsHeaders(res: Response) {
@@ -23,7 +25,7 @@ const replicate = new Replicate({
   auth: env.REPLICATE_API_TOKEN,
 });
 
-const customVoiceWebhookHandler = async (req: NextRequest) => {
+const songGenerationFinished = async (req: NextRequest) => {
   const rawBody = await req.text();
 
   // verify this request if this is coming from replicate, if it is not, send forbidden access code
@@ -71,16 +73,21 @@ const customVoiceWebhookHandler = async (req: NextRequest) => {
     );
   }
 
-  console.log(
-    "signature matched, starting training new model",
-    "we are inside voice dataset finished webhook",
-  );
+  const { searchParams } = new URL(req.url);
+  const songId = searchParams.get("songId");
 
   const parsedBody = JSON.parse(rawBody);
 
-  const { searchParams } = new URL(req.url);
+  if (!songId) {
+    return Response.json(
+      { message: "you must specify songId in webhook query param" },
+      {
+        status: 400,
+      },
+    );
+  }
 
-  const voiceId = searchParams.get("voiceId");
+  console.log(parsedBody.output, songId);
 
   if (!parsedBody?.output) {
     return Response.json(
@@ -91,21 +98,14 @@ const customVoiceWebhookHandler = async (req: NextRequest) => {
     );
   }
 
-  await replicate.predictions.create({
-    version: "0397d5e28c9b54665e1e5d29d5cf4f722a7b89ec20e9dbf31487235305b1a101",
-    input: {
-      epoch: 80,
-      version: "v2",
-      f0method: "rmvpe_gpu",
-      batch_size: "7",
-      dataset_zip: parsedBody?.output,
-      sample_rate: "48k",
-    },
-    webhook: `${process.env.REPLICATE_WEBHOOK_URL}/api/replicate/model-training-finished?voiceId=${voiceId}`,
-    webhook_events_filter: ["completed"],
-  });
+  await db
+    .update(generatedSongs)
+    .set({
+      audioUrl: parsedBody?.output,
+    })
+    .where(eq(generatedSongs.id, songId));
 
-  return Response.json({ hello: "world" });
+  return Response.json({ message: "success" });
 };
 
-export { customVoiceWebhookHandler as POST };
+export { songGenerationFinished as POST };

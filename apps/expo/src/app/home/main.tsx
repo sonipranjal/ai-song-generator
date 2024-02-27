@@ -3,31 +3,33 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
 
 const MainScreen = () => {
-  const testApi = api.auth.getSession.useQuery();
+  const supabase = useSupabaseClient();
+  const getAllVoices = api.voice.getAllVoices.useQuery();
+  const getAllGeneratedSongs = api.voice.getAllGeneratedSongs.useQuery();
 
   return (
     <SafeAreaView>
       <ScrollView className="mb-8 p-4">
         <View className="flex w-full flex-row flex-wrap justify-center gap-4">
-          {Array.from({ length: 6 })
-            .map((_, i) => i)
-            .map((item) => (
+          {getAllVoices.isSuccess &&
+            getAllVoices.data.allVoices.map((voice) => (
               <TouchableOpacity
-                key={item}
+                key={voice.id}
                 onPress={() => {
                   router.push({
                     pathname: "/home/generate-song",
-                    params: { id: item + 1 },
+                    params: { voiceId: voice.id },
                   });
                 }}
                 className="flex min-h-[190px] min-w-[190px] items-center justify-center rounded-3xl bg-black/40"
               >
-                <Text>celebrity voice no. {item + 1} </Text>
+                <Text>{voice.name}</Text>
               </TouchableOpacity>
             ))}
         </View>
@@ -45,21 +47,40 @@ const MainScreen = () => {
           <FlashList
             renderItem={({ item }) => {
               return (
-                <TouchableOpacity className="mt-4 flex h-16 w-full items-center justify-center rounded-lg bg-purple-600">
-                  <Text>generated song {item + 1}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    const params = {
+                      url: item.audioUrl ?? "",
+                    };
+
+                    router.push({
+                      pathname: "/home/play-song",
+                      params,
+                    });
+                  }}
+                  className="mt-4 flex h-16 w-full items-center justify-center rounded-lg bg-purple-600"
+                >
+                  <Text>{item.title}</Text>
                 </TouchableOpacity>
               );
             }}
             estimatedItemSize={64}
-            data={Array.from({ length: 6 }).map((_, i) => i)}
+            data={getAllGeneratedSongs.data?.allGeneratedSongs}
           />
         </View>
       </ScrollView>
-      <View className="h-[20%] px-4">
+      <View className="h-[20%] gap-4 px-4">
         <Button
           buttonText="Generate custom song"
           onPressHandler={() => {
             router.push("/home/create-custom-voice");
+          }}
+        />
+        <Button
+          buttonText="Sign out"
+          onPressHandler={async () => {
+            await supabase.auth.signOut();
+            router.push("/");
           }}
         />
       </View>

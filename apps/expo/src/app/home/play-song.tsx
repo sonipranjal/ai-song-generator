@@ -1,10 +1,10 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { Audio } from "expo-av";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 
 import { Button } from "~/components/ui/button";
@@ -13,12 +13,18 @@ const _sound = new Audio.Sound();
 
 const PlaySong = () => {
   const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams();
+
+  console.log(params);
 
   const playSound = async () => {
+    if (!params.url || typeof params.url !== "string") {
+      return Alert.alert("we can't find this song!");
+    }
     try {
       !_sound._loaded &&
         (await _sound.loadAsync({
-          uri: "https://eoibsftippnvzdselnts.supabase.co/storage/v1/object/public/songs/perfect-beauty-191271.mp3?t=2024-02-25T16%3A41%3A21.404Z",
+          uri: params.url,
         }));
       await _sound.playAsync();
     } catch (error) {
@@ -59,7 +65,7 @@ const PlaySong = () => {
           Play generated song
         </Text>
         <Text className="text-sm font-semibold text-gray-900">
-          Generate song from youtube video - youtube title
+          Generate song from youtube video
         </Text>
         <View className="gap-4">
           <View className="flex flex-row justify-center gap-4">

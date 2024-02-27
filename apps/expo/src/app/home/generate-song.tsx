@@ -1,5 +1,12 @@
 import React from "react";
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -11,6 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "~/components/ui/button";
+import { api } from "~/utils/api";
 
 const formSchema = z.object({
   youtubeUrl: z.string().url({
@@ -26,9 +34,28 @@ const GenerateSong = () => {
     resolver: zodResolver(formSchema),
   });
 
-  // todo: handle generate song
+  const generateSong = api.voice.generateAISong.useMutation();
+
   const handleGenerateSong = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    if (!params.voiceId || typeof params.voiceId !== "string") {
+      return Alert.alert("we can't find this voice!");
+    }
+
+    generateSong.mutate(
+      {
+        voiceId: params.voiceId,
+        youtubeUrl: values.youtubeUrl,
+      },
+      {
+        onSuccess: () => {
+          Alert.alert("song is being generated!");
+          router.push("/home/main");
+        },
+        onError: () => {
+          Alert.alert("something went wrong while generating the song!");
+        },
+      },
+    );
   };
 
   return (
@@ -80,11 +107,8 @@ const GenerateSong = () => {
 
           <Button
             buttonText="Generate Song"
-            onPressHandler={() => {
-              console.log("generating song from video url", params.id);
-              form.handleSubmit(handleGenerateSong)();
-              router.push("/home/play-song");
-            }}
+            onPressHandler={form.handleSubmit(handleGenerateSong)}
+            isLoading={generateSong.isPending}
           />
         </View>
       </View>

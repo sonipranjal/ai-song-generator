@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -32,7 +32,16 @@ const CreateCustomVoice = () => {
   });
 
   const handleCreateCustomVoice = (values: z.infer<typeof formSchema>) => {
-    createCustomVoice.mutate(values);
+    createCustomVoice.mutate(values, {
+      onSuccess: () => {
+        Alert.alert(
+          "custom voice is being created",
+          "please wait for some time, we will email you once it is ready.",
+        );
+        router.push("/home/main");
+        form.reset();
+      },
+    });
   };
 
   return (

@@ -3,8 +3,7 @@ import postgres from "postgres";
 
 import * as schema from "./schema";
 
-export { schema };
-
+export * from "./schema";
 export * from "drizzle-orm";
 
 const connectionString = process.env.DATABASE_URL;

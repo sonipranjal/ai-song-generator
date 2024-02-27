@@ -18,7 +18,9 @@
     "@ai-song-generator/validators": "*",
     "@trpc/server": "11.0.0-next-beta.294",
     "replicate": "^0.27.1",
+    "slugify": "^1.6.6",
     "superjson": "2.2.1",
+    "ytdl-core": "^4.11.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
