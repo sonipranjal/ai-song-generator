@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import axios from "axios";
 import Replicate from "replicate";
 import ytdl from "ytdl-core";
 import { z } from "zod";
@@ -81,7 +82,41 @@ export const voiceRouter = createTRPCRouter({
         });
       }
 
-      // todo: we need to extract mp3 from youtube video and save it inside our supabase storage and pass it here
+      // we need to extract mp3 from youtube video and save it inside our supabase storage and pass it here
+
+      const ytMp3APi = process.env.YOUTUBE_TO_MP3_API;
+      const secret = process.env.SECRET_TOKEN;
+
+      let mp3Url;
+
+      try {
+        const res = await axios.post(
+          `${ytMp3APi}?url=${youtubeUrl}`,
+          undefined,
+          {
+            headers: {
+              "SECRET-KEY": secret,
+            },
+          },
+        );
+        console.log(res.data.mp3_url);
+
+        mp3Url = res.data.mp3_url;
+      } catch (error) {
+        console.log(error);
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "we can't process this youtube video now",
+        });
+      }
+
+      if (!mp3Url) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "we can't process this youtube video now",
+        });
+      }
 
       try {
         await replicate.predictions.create({
@@ -91,8 +126,7 @@ export const voiceRouter = createTRPCRouter({
             protect: 0.33,
             rvc_model: "CUSTOM",
             index_rate: 0.5,
-            song_input:
-              "https://replicate.delivery/pbxt/JsPIizFfRy54Jk5LuXdnrNdV1JHJ6oLmPPdRuIfh3lvpoNai/gangnam.mp3",
+            song_input: mp3Url,
             reverb_size: 0.15,
             pitch_change: "no-change",
             rms_mix_rate: 0.25,

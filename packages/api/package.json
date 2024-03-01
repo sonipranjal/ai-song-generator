@@ -17,6 +17,7 @@
     "@ai-song-generator/db": "*",
     "@ai-song-generator/validators": "*",
     "@trpc/server": "11.0.0-next-beta.294",
+    "axios": "^1.6.7",
     "replicate": "^0.27.1",
     "slugify": "^1.6.6",
     "superjson": "2.2.1",
